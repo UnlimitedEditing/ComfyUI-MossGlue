@@ -77,7 +77,12 @@ class MossLocalLoader:
         kwargs = {"trust_remote_code": True, "codec_path": codec_dir}
         if model_variant == "MOSS-VoiceGenerator":
             kwargs["normalize_inputs"] = True
-        processor = AutoProcessor.from_pretrained(model_dir, **kwargs)
+        # AutoProcessor (transformers 5.0.0) injects revision="main", which MOSS's processor forwards
+        # into ProcessorMixin.__init__ ("Unexpected keyword argument revision"). Load the class directly.
+        from transformers.dynamic_module_utils import get_class_from_dynamic_module
+
+        proc_cls = get_class_from_dynamic_module("processing_moss_tts.MossTTSDelayProcessor", model_dir)
+        processor = proc_cls.from_pretrained(model_dir, **kwargs)
 
         model = AutoModel.from_pretrained(
             model_dir, trust_remote_code=True,

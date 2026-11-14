@@ -55,7 +55,7 @@ class MossLocalLoader:
     CATEGORY = "audio/MOSS-TTS"
 
     def load(self, model_variant):
-        from transformers import AutoModel, AutoProcessor
+        from transformers import AutoModel
 
         if model_variant in _cache:
             return (_cache[model_variant],)
